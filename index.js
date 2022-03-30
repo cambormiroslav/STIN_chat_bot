@@ -17,10 +17,11 @@ nunjucks.configure('views', {
 app.use(express.static("public"));
 app.use(express.static(__dirname));
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 //data
 const name = "Tony";
-const help = { "exchange_today/exchange_today eur ": "exchange today rate Czech crowns to Euro", "help": "my functions", "name": "my name", "time": "time now" };
+const help = { "exchange_today/exchange_today eur": "exchange today rate Czech crowns to Euro", "help": "my functions", "name": "my name", "time": "time now" };
 const can_be_find_exchange = { "eur": "EUR" };
 const exchange_output = { "eur": "Euro" };
 
@@ -107,4 +108,11 @@ app.post("/exchange_today", (req, res, next) => {
     }
 });
 
-app.listen(process.env.PORT || 5555);
+const server = app.listen(process.env.PORT || 5555);
+
+function stop() {
+    server.close();
+}
+
+module.exports = app;
+module.exports.stop = stop;
