@@ -3,7 +3,11 @@ const supertest = require('supertest');
 const requestWithSupertest = supertest(server);
 const date = require('date-and-time');
 
-const today_exchange_eur = "24,460";
+const today = new Date();
+const string_today_time = date.format(today, 'HH:mm:ss');
+const today_number_of_day = today.getDay();
+const today_exchange_eur = require('./for_tests.json')["EUR"];
+const history_of_exchange_eur = require('./for_tests.json')["history_EUR"];
 
 describe('Get name of bot', () => {
 
@@ -37,8 +41,6 @@ describe('Get name of bot', () => {
 describe('Get actual time', () => {
 
     it('POST /time – actual time', async() => {
-        const today = new Date();
-        const string_today_time = date.format(today, 'HH:mm:ss');
         const res = await requestWithSupertest.post('/time');
         expect(res.status).toEqual(200);
         expect(res.body.output).toEqual(`In this moment is ${string_today_time}.`);
@@ -70,7 +72,7 @@ describe('Get help', () => {
     it('POST /help – get help', async() => {
         const res = await requestWithSupertest.post('/help');
         expect(res.status).toEqual(200);
-        expect(res.body.output).toEqual("exchange_today/exchange_today eur - exchange today rate Czech crowns to Euro || help - my functions || name - my name || time - time now || ");
+        expect(res.body.output).toEqual("what is the course / What is the course / what is the course for EUR / What is the course for EUR - exchange today rate Czech crowns to Euro || help / Help - my functions || what is your name / What is your name - my name || what is the time / What is the time - time now || ");
     });
 });
 
@@ -145,6 +147,86 @@ describe('Get today exchange', () => {
         expect(res.body.output).toEqual("You want some exchange, which I cannot done or you type two parameters.");
     });
 });
+
+if (today_number_of_day == (6 || 7)) {
+    describe('Get history from server day in weekend', () => {
+
+        it('POST /history – get today history of exchange from start of server', async() => {
+            const res = await requestWithSupertest.post('/history');
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual("It is weekend and I live from this weekend, I am sorry. Came back in Monday for first history.");
+        });
+    });
+
+    describe('Get history from server day in weekend', () => {
+
+        it('POST /history – get today history of exchange from start of server with one parameter', async() => {
+            const req = { first: "eur" };
+            const res = await requestWithSupertest.post('/history').send(req);
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual("It is weekend and I live from this weekend, I am sorry. Came back in Monday for first history.");
+        });
+    });
+
+    describe('Get history from server day in weekend', () => {
+
+        it('POST /history – get today history of exchange from start of server with first bad parameter', async() => {
+            const req = { first: "usd" };
+            const res = await requestWithSupertest.post('/history').send(req);
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual("It is weekend and I live from this weekend, I am sorry. Came back in Monday for first history.");
+        });
+    });
+
+    describe('Get history from server day in weekend', () => {
+
+        it('POST /history – get today history of exchange from start of server with more parameter', async() => {
+            const req = { first: "usd", second: "eur" };
+            const res = await requestWithSupertest.post('/history').send(req);
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual("It is weekend and I live from this weekend, I am sorry. Came back in Monday for first history.");
+        });
+    });
+} else {
+    describe('Get history from server day', () => {
+
+        it('POST /history – get today history of exchange from start of server', async() => {
+            const res = await requestWithSupertest.post('/history');
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual(`Exchange history for Euro from start of server is ${history_of_exchange_eur}.`);
+        });
+    });
+
+    describe('Get history from server day', () => {
+
+        it('POST /history – get today history of exchange from start of server with one parameter', async() => {
+            const req = { first: "eur" };
+            const res = await requestWithSupertest.post('/history').send(req);
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual(`Exchange history for Euro from start of server is ${history_of_exchange_eur}.`);
+        });
+    });
+
+    describe('Get history from server day', () => {
+
+        it('POST /history – get today history of exchange from start of server with first bad parameter', async() => {
+            const req = { first: "usd" };
+            const res = await requestWithSupertest.post('/history').send(req);
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual("You want some history for exchange, which I cannot done or you type more than one parameter.");
+        });
+    });
+
+    describe('Get history from server day', () => {
+
+        it('POST /history – get today history of exchange from start of server with more parameter', async() => {
+            const req = { first: "usd", second: "eur" };
+            const res = await requestWithSupertest.post('/history').send(req);
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual("You want some history for exchange, which I cannot done or you type more than one parameter.");
+        });
+    });
+}
 
 describe('Do undefined function', () => {
 
