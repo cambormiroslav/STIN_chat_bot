@@ -118,7 +118,7 @@ app.post("/history", (req, res, next) => {
     tomorow.setDate(tomorow.getDate() + 1);
     const string_tomorow_date = date.format(tomorow, 'DD.MM.YYYY');
 
-    if (start_day_date_string == string_today_date || start_day_date_string == string_tomorow_date && today.getDay() == (6 || 7)) {
+    if ((start_day_date_string == string_today_date || start_day_date_string == string_tomorow_date) && today.getDay() == (6 || 7)) {
         let result = { "output": "It is weekend and I live from this weekend, I am sorry. Came back in Monday for first history." };
         res.json(result);
         res.send();
