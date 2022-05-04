@@ -4,7 +4,7 @@ const path = require('path');
 const nunjucks = require('nunjucks');
 const axios = require('axios');
 const date = require('date-and-time');
-
+const config_file = require('./config.json');
 
 app.set('views', path.join(__dirname, 'views'));
 
@@ -20,12 +20,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 //data
-const name = "Tony";
-const help = { "what is the course / What is the course / what is the course for EUR / What is the course for EUR": "exchange today rate Czech crowns to Euro", "help / Help": "my functions", "what is your name / What is your name": "my name", "what is the time / What is the time": "time now" };
-const can_be_find_exchange = { "eur": "EUR" };
-const exchange_output = { "eur": "Euro" };
-const start_day_date_string = date.format(new Date(), 'DD.MM.YYYY');
-//const start_day_date_string = "29.04.2022"; //for test only when server starts in weekend
+const name = config_file["name"];
+const help = config_file["help"];
+const can_be_find_exchange = config_file["can_be_find_exchange"];
+const exchange_output = config_file["exchange_output"];
+//const start_day_date_string = date.format(new Date(), 'DD.MM.YYYY');
+const start_day_date_string = config_file["date_deploy"];
 
 app.get("/", (req, res) => {
     res.sendFile(__dirname + '/views/bot.html');

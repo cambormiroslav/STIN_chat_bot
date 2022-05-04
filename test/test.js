@@ -2,12 +2,14 @@ const server = require('../index.js');
 const supertest = require('supertest');
 const requestWithSupertest = supertest(server);
 const date = require('date-and-time');
+const test_config = require('./for_tests.json');
 
 const today = new Date();
 const string_today_time = date.format(today, 'HH:mm:ss');
 const today_number_of_day = today.getDay();
-const today_exchange_eur = require('./for_tests.json')["EUR"];
-const history_of_exchange_eur = require('./for_tests.json')["history_EUR"];
+const today_exchange_eur = test_config["EUR"];
+const history_of_exchange_eur = test_config["history_EUR"];
+const help_function = test_config["help"];
 
 describe('Get name of bot', () => {
 
@@ -72,7 +74,7 @@ describe('Get help', () => {
     it('POST /help – get help', async() => {
         const res = await requestWithSupertest.post('/help');
         expect(res.status).toEqual(200);
-        expect(res.body.output).toEqual("what is the course / What is the course / what is the course for EUR / What is the course for EUR - exchange today rate Czech crowns to Euro || help / Help - my functions || what is your name / What is your name - my name || what is the time / What is the time - time now || ");
+        expect(res.body.output).toEqual(help_function);
     });
 });
 
