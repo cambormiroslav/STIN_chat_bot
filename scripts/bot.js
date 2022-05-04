@@ -6,6 +6,12 @@ function init() {
     document.getElementById('msg').appendChild(res_elm);
 }
 
+document.getElementById('msg_send').addEventListener("keypress", async(e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("reply").click();
+    }
+});
 
 document.getElementById('reply').addEventListener("click", async(e) => {
     e.preventDefault();
