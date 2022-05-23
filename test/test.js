@@ -10,6 +10,7 @@ const today_number_of_day = today.getDay();
 const today_exchange_eur = test_config["EUR"];
 const history_of_exchange_eur = test_config["history_EUR"];
 const help_function = test_config["help"];
+const average_of_exchange_eur = test_config["average_EUR"];
 
 describe('Get name of bot', () => {
 
@@ -251,6 +252,48 @@ describe('Get method', () => {
     it('GET /undefined – undefined', async() => {
         const res = await requestWithSupertest.get('/undefined');
         expect(res.status).toEqual(404);
+    });
+});
+
+if (Number(average_of_exchange_eur) < 10) {
+    describe('Check, if the consumer can buy EUR', () => {
+
+        it('POST /check – check the euro', async() => {
+            const req = { first: "eur" };
+            const res = await requestWithSupertest.post('/check').send(req);
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual(`The exchange is good. The average of changes in 3 days is ${average_of_exchange_eur} %. I recommend you to buy it.`);
+        });
+    });
+} else {
+    describe('Check, if the consumer can buy EUR', () => {
+
+        it('POST /check – check the euro', async() => {
+            const req = { first: "eur" };
+            const res = await requestWithSupertest.post('/check').send(req);
+            expect(res.status).toEqual(200);
+            expect(res.body.output).toEqual(`The exchange is not good. The average of changes in 3 days is ${average_of_exchange_eur} %. I do not recommend you to buy it.`);
+        });
+    });
+}
+
+describe('Check, if the consumer can buy EUR', () => {
+
+    it('POST /check – check the usd', async() => {
+        const req = { first: "usd" };
+        const res = await requestWithSupertest.post('/check').send(req);
+        expect(res.status).toEqual(200);
+        expect(res.body.output).toEqual("You want some exchange, which I cannot done or you type two parameters.");
+    });
+});
+
+describe('Check, if the consumer can buy EUR', () => {
+
+    it('POST /check – check the usd and second parameter (more parameters)', async() => {
+        const req = { first: "usd", second: "eur" };
+        const res = await requestWithSupertest.post('/check').send(req);
+        expect(res.status).toEqual(200);
+        expect(res.body.output).toEqual("You want some exchange, which I cannot done or you type two parameters.");
     });
 });
 
