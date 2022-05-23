@@ -34,7 +34,10 @@ document.getElementById('reply').addEventListener("click", async(e) => {
         req = "history";
     } else if (sended_message.match(/What is the history for EUR/) || sended_message.match(/what is the history for EUR/)) {
         req = "history eur";
+    } else if (sended_message.match(/Can I buy EUR/) || sended_message.match(/can I buy EUR/)) {
+        req = "check eur";
     }
+
 
     var res = "";
 

@@ -159,6 +159,67 @@ app.post("/history", (req, res, next) => {
     }
 });
 
+app.post("/check", (req, res, next) => {
+    const today = new Date();
+    const string_today_date = date.format(today, 'DD.MM.YYYY');
+    const from_date = new Date();
+    from_date.setDate(from_date.getDate() - 9);
+    const string_from_date = date.format(from_date, 'DD.MM.YYYY');
+
+    let getExchange = 0;
+    let exchange = "";
+    let exghange_printed = "";
+    if (can_be_find_exchange[req.body.first] != null && req.body.second == undefined) {
+        exchange = can_be_find_exchange[req.body.first];
+        exghange_printed = exchange_output[req.body.first];
+        getExchange = 1;
+    }
+    if (getExchange == 1) {
+        axios.get(`https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/vybrane.html?od=${string_from_date}&do=${string_today_date}&mena=${exchange}&format=html`).then(({ data }) => {
+            let dat = data;
+            let table_from_start = dat.split("<table>")[1];
+            let table_to_end = table_from_start.split("</table>")[0];
+            let rows = table_to_end.split("\n");
+            let preprelast_row = rows[rows.length - 4];
+            let prelast_row = rows[rows.length - 3];
+            let last_row = rows[rows.length - 2];
+
+            let array_preprelast_row = preprelast_row.split("</td>");
+            let array_prelast_row = prelast_row.split("</td>");
+            let array_last_row = last_row.split("</td>");
+
+            let preprelast_date = array_preprelast_row[0].replace("<tr><td>", "");
+            let prelast_date = array_prelast_row[0].replace("<tr><td>", "");
+            let last_date = array_last_row[0].replace("<tr><td>", "");
+
+            let preprelast_course = Number(array_preprelast_row[1].replace("<td>", "").replace(",", "."));
+            let prelast_course = Number(array_prelast_row[1].replace("<td>", "").replace(",", "."));
+            let last_course = Number(array_last_row[1].replace("<td>", "").replace(",", "."));
+
+            let first_change_in_percent = ((prelast_course - preprelast_course) / preprelast_course) * 100
+            let second_change_in_percent = ((last_course - prelast_course) / prelast_course) * 100
+            let avg_of_percents = (first_change_in_percent + second_change_in_percent) / 2;
+
+            let avg_of_percents_two_decimals = avg_of_percents.toFixed(2);
+
+            let result = { "output": `You must have ${exchange} CZK to have 1 ${exghange_printed} today.` };
+
+            if (avg_of_percents >= 10) {
+                result = { "output": `The exchange is not good. The average of changes in 3 days is ${avg_of_percents_two_decimals} %. I do not recommend you to buy it.` };
+            } else {
+                result = { "output": `The exchange is good. The average of changes in 3 days is ${avg_of_percents_two_decimals} %. I recommend you to buy it.` };
+            }
+
+            res.json(result);
+            res.send();
+        });
+    } else {
+        let result = { "output": "You want some exchange, which I cannot done or you type two parameters." };
+        res.json(result);
+        res.send();
+    }
+});
+
 const server = app.listen(process.env.PORT || 5555);
 
 function stop() {
